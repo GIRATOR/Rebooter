@@ -1,0 +1,105 @@
+<resources>
+    <string name="app_name">Rebooter</string>
+    <string name="tittle_app">Rebooter configuration</string>
+    <!-- main switch -->
+    <string name="tittle_switch_main">Background service</string>
+    <string name="summ_switch_on">[Enabled]</string>
+    <string name="summ_switch_off">[Disabled]</string>
+    <string name="summ_switch_main_running">service is running</string>
+    <string name="summ_switch_main_error">Error:</string>
+    <string name="summ_switch_main_not">service not running</string>
+    <string name="summ_switch_main_4">Scheduled check:</string>
+    <string name="date_format_switch_main">EEEE HH:mm, dd-MM-yyyy</string>
+    <!-- settings group -->
+    <string name="tittle_cat_general">General settings</string>
+    <!-- user activity -->
+    <string name="tittle_switch_activity">User activity trigger</string>
+    <string name="summ_switch_activity_on">[Enabled] Reboot if screen was not unlocked for set period of time</string>
+    <string name="summ_switch_activity_off">[Disabled] Reboot in set periods of time if other not defined by schedule</string>
+    <!-- reboot period -->
+    <string name="tittle_edit_period">Reboot period</string>
+    <string name="summ_edit_period_hours">hours</string>
+    <string name="summ_edit_period_minutes">minutes</string>
+    <string name="tittle_edit_period_dialog">Enter reboot period</string>
+    <string name="desc_edit_minimum_period">Minimal period is</string>
+    <string name="tittle_edit_period_more_dialog">Need more then 24 hours?</string>
+    <!-- schedule switch -->
+    <string name="tittle_switch_schedule">Schedule</string>
+    <string name="summ_switch_schedule_on">[Enabled] Reboot on set days and time</string>
+    <string name="summ_switch_schedule_off">[Disabled] Reboot time defined by period and user activity</string>
+    <!-- week days array -->
+    <string name="Monday">Monday</string>
+    <string name="Tuesday">Tuesday</string>
+    <string name="Wednesday">Wednesday</string>
+    <string name="Thursday">Thursday</string>
+    <string name="Friday">Friday</string>
+    <string name="Saturday">Saturday</string>
+    <string name="Sunday">Sunday</string>
+    <!-- schedule inputs -->
+    <string name="tittle_edit_time">Time of day</string>
+    <string name="tittle_edit_time_dialog">Enter time in 24 hour format</string>
+    <string name="tittle_edit_day">Days of week</string>
+    <string name="desc_edit_day_zero">Select at least one day, or disable schedule</string>
+    <string name="tittle_edit_day_dialog">Select days on which to reboot</string><!-- permissions nag -->
+    <string name="tittle_alert_permissions">Rebooter permissions</string>
+    <!-- permissions nag -->
+    <string name="desc_alert_permissions">You will be asked to grant root permissions. It is mandatory for app to work, unless it installed as system app.\nOther permissions are optional, intended to mitigate limitations of Doze and App Standby modes.</string>
+    <string name="desc_alert_cancel">Cancel</string>
+    <string name="desc_alert_proceeed">Proceed</string>
+    <string name="desc_alert_no">no</string>
+    <string name="desc_alert_yes">yes</string>
+    <string name="tittle_nag_permission">Request permissions</string>
+    <string name="summ_nag_permission">Request optional permissions, again\n(if denied during first launch)</string>
+    <!-- service notification -->
+    <string name="desc_notification_stopped">Service stopped. Restart it when done with settings.</string>
+    <string name="tittle_channel_service">Service running</string>
+    <string name="tittle_channel_info">Next reboot time</string>
+    <string name="desc_notification_service">service is running</string>
+    <string name="desc_notification_scheduled">Next expected reboot</string>
+    <string name="desc_notification_reboot_error">Error atemptting reboot</string>
+    <!-- executable group -->
+    <string name="tittle_cat_system">Excecutable</string>
+    <string name="tittle_reboot_method">Reboot method</string>
+    <string name="opt_reboot_method_inline">Inline</string>
+    <string name="opt_reboot_method_stream">Stream</string>
+    <string name="opt_reboot_method_intent">Intent</string>
+    <string name="summ_reboot_method_inline">Complete executable path with all parameters  (root reqired)</string>
+    <string name="summ_reboot_method_stream">Commands for \"su\" data output stream separated by \";\"  (root reqired)</string>
+    <string name="summ_reboot_method_intent">Direct android system reboot intent  (system app only)</string>
+    <string name="tittle_edit_reboot_command">Reboot command</string>
+    <string name="tittle_edit_reboot_command_dialog">Input command string</string>
+    <string name="tittle_example_reboot_command">Set command from examples</string>
+    <!-- command examples strings -->
+    <!-- dont add/delete/change/rename these -->
+    <!-- if need so, make apropriate changes in SettingsActivity example_reboot_command.setOnPreferenceChangeListener -->
+    <string name="inline_command_1" translatable="false">/system/bin/su -c am start -a android.intent.action.REBOOT</string>
+    <string name="inline_command_2" translatable="false">/system/bin/su -c reboot</string>
+    <string name="inline_command_3" translatable="false">/system/bin/su -c /system/bin/reboot</string>
+    <string name="inline_command_4" translatable="false">/system/xbin/su -c am start -a android.intent.action.REBOOT</string>
+    <string name="inline_command_5" translatable="false">/system/xbin/su -c reboot</string>
+    <string name="stream_command_1" translatable="false">am start -a android.intent.action.REBOOT</string>
+    <string name="stream_command_2" translatable="false">reboot</string>
+    <!-- test reboot -->
+    <string name="tittle_reboot_test">Test reboot</string>
+    <string name="desc_reboot_dialog">Try reboot with this command now?</string>
+    <!-- extra group -->
+    <string name="tittle_cat_advanced">Extra options</string>
+    <string name="tittle_edit_interval">Check interval</string>
+    <string name="tittle_edit_interval_ok">OK</string>
+    <string name="tittle_edit_interval_cancel">Cancel</string>
+    <string name="summ_edit_interval">How often service checks reboot conditions</string>
+    <string name="tittle_edit_interval_dialog">Select interval in minutes</string>
+    <string name="tittle_edit_noice">Warning with sound</string>
+    <string name="tittle_edit_noice_dialog">Sound to play before reboot</string>
+    <string name="tittle_edit_tts">Warning with TTS</string>
+    <string name="tittle_edit_tts_error">TTS misconfigured or not available</string>
+    <string name="tittle_edit_tts_dialog">Text to speak before reboot</string>
+    <!-- usb connection trigger -->
+    <string name="tittle_mode_usb">USB connection trigger</string>
+    <string name="opt_mode_usb_off">Disabled</string>
+    <string name="opt_mode_usb_locked">Locked only</string>
+    <string name="opt_mode_usb_on">Always</string>
+    <string name="desc_mode_usb_on">Reboot when host USB connection detected</string>
+    <string name="desc_mode_usb_locked">but phone is not unlocked</string>
+
+</resources>

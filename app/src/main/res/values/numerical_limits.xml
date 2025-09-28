@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- default values as string for layout xml -->
+    <string name="period_default" translatable="false">24:00</string>
+    <string name="schedule_time_default" translatable="false">21:30</string>
+    <string name="interval_minutes_default" translatable="false">60</string>
+    <!-- limits for user input validation-->
+    <integer name="period_minutes_min">15</integer>
+    <integer name="interval_minutes_min">15</integer>
+    <integer name="interval_minutes_max">360</integer><!-- 60*6 -->
+    <!-- mimimal uptime before reboot -->
+    <integer name="uptime_minutes_min">5</integer>
+</resources>

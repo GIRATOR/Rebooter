@@ -1,0 +1,98 @@
+<resources>
+    <string name="app_name">Перезавантажувач</string>
+    <string name="tittle_app">Налаштування перезавантажувача</string>
+    <!-- main switch -->
+    <string name="tittle_switch_main">Фоновий сервіс</string>
+    <string name="summ_switch_on">[Увімкнено]</string>
+    <string name="summ_switch_off">[Вимкнено]</string>
+    <string name="summ_switch_main_running">сервіс працює</string>
+    <string name="summ_switch_main_error">Помилка:</string>
+    <string name="summ_switch_main_not">сервіс не працює</string>
+    <string name="summ_switch_main_4">Запланована звірка:</string>
+    <string name="date_format_switch_main">EEEE HH:mm, dd-MM-yyyy</string>
+    <!-- settings group -->
+    <string name="tittle_cat_general">Загальні налаштування</string>
+    <!-- user activity -->
+    <string name="tittle_switch_activity">Тригер активності користувача</string>
+    <string name="summ_switch_activity_on">[Увімкнено] Перезавантажити якщо екран не розблоковувався протягом вказаного періоду</string>
+    <string name="summ_switch_activity_off">[Вимкнено] Перезавантажувати через вказаний період, якщо інше не задано розкладом</string>
+    <!-- reboot period -->
+    <string name="tittle_edit_period">Період</string>
+    <string name="summ_edit_period_hours">годин</string>
+    <string name="summ_edit_period_minutes">хвилин</string>
+    <string name="tittle_edit_period_dialog">Введіть період перезавантаження</string>
+    <!-- input validation -->
+    <string name="desc_edit_minimum_period">Мінімальний період</string>
+    <!-- schedule switch -->
+    <string name="tittle_switch_schedule">Розклад</string>
+    <string name="summ_switch_schedule_on">[Увімкнено] Перезавантажувати у вказаний час та дні</string>
+    <string name="summ_switch_schedule_off">[Вимкнено] Час перезавантаження визначається періодом та активністю користувача</string>
+    <!-- week days array -->
+    <string name="Monday">Понеділок</string>
+    <string name="Tuesday">Вівторок</string>
+    <string name="Wednesday">Середа</string>
+    <string name="Thursday">Четвер</string>
+    <string name="Friday">П\'ятниця</string>
+    <string name="Saturday">Субота</string>
+    <string name="Sunday">Неділя</string>
+    <!-- schedule inputs -->
+    <string name="tittle_edit_time">Час</string>
+    <string name="tittle_edit_time_dialog">Введіть час в 24-годинному форматі</string>
+    <string name="tittle_edit_day">Дні тижня</string>
+    <string name="desc_edit_day_zero">Оберіть хоча б один день, або вимкніть розклад</string>
+    <string name="tittle_edit_day_dialog">Оберіть дні у які перезавантажувати</string><!-- permissions nag -->
+    <string name="tittle_alert_permissions">Надання дозволів</string>
+    <!-- permissions nag -->
+    <string name="desc_alert_permissions">Вам буде запропоновано надати права root-доступу. Це є обов\'язковим для роботи перезавантаження, за винятком коли встановлено на рівні системи.\nРешта дозволів є додатковими та призначені для покращення роботи в режимі сну та економії енергії.</string>
+    <string name="desc_alert_cancel">Скасувати</string>
+    <string name="desc_alert_proceeed">Продовжити</string>
+    <string name="tittle_nag_permission">Запит надання прав</string>
+    <string name="summ_nag_permission">Запитати додаткові права, знову\n(якщо було відмолено за першого запуску)</string>
+    <!-- service notification -->
+    <string name="desc_notification_stopped">Сервіс зупинено. Запустіть вручну коли завершите з налаштуваннями.</string>
+    <string name="tittle_channel_service">Робота сервісу</string>
+    <string name="tittle_channel_info">Час перезавантаження</string>
+    <string name="desc_notification_service">сервіс працює</string>
+    <string name="desc_notification_scheduled">Очікуване перезавантаження</string>
+    <string name="desc_notification_reboot_error">Помилка при спробі перезавантаження</string>
+    <!-- executable group -->
+    <string name="tittle_cat_system">Виконувана команда</string>
+    <string name="tittle_reboot_method">Спосіб перезавантаження</string>
+    <string name="opt_reboot_method_inline">Команда</string>
+    <string name="opt_reboot_method_stream">Потік</string>
+    <string name="opt_reboot_method_intent">Запит</string>
+    <string name="summ_reboot_method_inline">Повний шлях до виконуваного файлу з усіма параметрами (потрібен root)</string>
+    <string name="summ_reboot_method_stream">Команди для вихідного потоку \"su\" розділені \";\" (потрібен root)</string>
+    <string name="summ_reboot_method_intent">Системний запит android на перезавантаження (лише система)</string>
+    <string name="tittle_edit_reboot_command">Командний рядок</string>
+    <string name="tittle_edit_reboot_command_dialog">Введіть команду(и)</string>
+    <string name="tittle_example_reboot_command">Приклади налаштування</string>
+    <!-- command examples strings -->
+    <!-- dont add/delete/change/rename these -->
+    <!-- if need so, make apropriate changes in SettingsActivity example_reboot_command.setOnPreferenceChangeListener -->
+    <!-- test reboot -->
+    <string name="tittle_reboot_test">Тест перезавантаження</string>
+    <string name="desc_reboot_dialog">Спробувати перезавантаження цією командою?</string>
+    <!-- extra group -->
+    <string name="tittle_cat_advanced">Додаткові налаштування</string>
+    <string name="tittle_edit_interval">Інтервал перевірки</string>
+    <string name="tittle_edit_interval_ok">Зберегти</string>
+    <string name="tittle_edit_interval_cancel">Скасувати</string>
+    <string name="summ_edit_interval">Частота перевірки умов перезавантаження сервісом</string>
+    <string name="tittle_edit_interval_dialog">Введіть інтервал в хвилинах</string>
+    <string name="tittle_edit_noice">Сповіщення звуком</string>
+    <string name="tittle_edit_noice_dialog">Мелодія перед перезавантаженням</string>
+    <string name="tittle_edit_tts">Сповіщення мовленням</string>
+    <string name="tittle_edit_tts_error">TTS не налаштований або не доступний</string>
+    <string name="tittle_edit_tts_dialog">Вимовити текст перед завантаженням</string>
+    <!-- usb connection trigger -->
+    <string name="tittle_mode_usb">Тригер USB з\'єднання</string>
+    <string name="opt_mode_usb_off">Вимкнено</string>
+    <string name="opt_mode_usb_locked">Лише заблокований</string>
+    <string name="opt_mode_usb_on">Завжди</string>
+    <string name="desc_mode_usb_on">Перезавантажити якщо виявлено USB-host з\'єднання</string>
+    <string name="desc_mode_usb_locked">а телефон не розблоковано</string>
+    <string name="tittle_edit_period_more_dialog">Птрібно більше ніж 24 годни?</string>
+    <string name="desc_alert_no">ні</string>
+    <string name="desc_alert_yes">так</string>
+</resources>

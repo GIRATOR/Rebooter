@@ -1,0 +1,134 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SwitchPreference
+        android:defaultValue="false"
+        android:icon="@drawable/ic_period"
+        android:key="switch_main"
+        android:title="@string/tittle_switch_main"
+        app:iconSpaceReserved="false" />
+    <PreferenceCategory
+        android:title="@string/tittle_cat_general"
+        app:iconSpaceReserved="false">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:icon="@drawable/ic_activity"
+            android:key="switch_activity"
+            android:title="@string/tittle_switch_activity"
+            app:iconSpaceReserved="false"
+            app:summaryOff="@string/summ_switch_activity_off"
+            app:summaryOn="@string/summ_switch_activity_on" />
+        <com.github.girator.rebooter.TimePreference
+            android:defaultValue="@string/period_default"
+            android:key="edit_period"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/tittle_edit_period"
+            app:dialogIcon="@drawable/ic_interval"
+            app:dialogTitle="@string/tittle_edit_period_dialog"
+            app:icon="@drawable/ic_interval" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:icon="@drawable/ic_calendar"
+            android:key="switch_schedule"
+            android:summaryOff="@string/summ_switch_schedule_off"
+            android:summaryOn="@string/summ_switch_schedule_on"
+            android:title="@string/tittle_switch_schedule" />
+        <com.github.girator.rebooter.TimePreference
+            android:defaultValue="@string/schedule_time_default"
+            android:key="edit_time"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/tittle_edit_time"
+            app:dialogIcon="@drawable/ic_time"
+            app:dialogTitle="@string/tittle_edit_time_dialog"
+            app:icon="@drawable/ic_time" />
+        <MultiSelectListPreference
+            android:defaultValue="@array/weekday_names"
+            android:dialogIcon="@drawable/ic_day"
+            android:entries="@array/weekday_names"
+            android:entryValues="@array/weekday_names"
+            android:icon="@drawable/ic_day"
+            android:key="edit_day"
+            android:title="@string/tittle_edit_day"
+            app:dialogTitle="@string/tittle_edit_day_dialog" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/tittle_cat_system"
+        app:iconSpaceReserved="false"
+        app:initialExpandedChildrenCount="0"
+        app:key="cat_extreme">
+        <DropDownPreference
+            android:entries="@array/reboot_methods"
+            android:icon="@drawable/ic_method"
+            android:key="reboot_method"
+            android:title="@string/tittle_reboot_method"
+            app:defaultValue="@string/opt_reboot_method_stream"
+            app:entryValues="@array/reboot_methods"
+            app:iconSpaceReserved="false" />
+        <EditTextPreference
+            android:defaultValue="@string/stream_command_1"
+            android:key="edit_reboot_command"
+            android:title="@string/tittle_edit_reboot_command"
+            app:dialogIcon="@drawable/ic_term"
+            app:dialogTitle="@string/tittle_edit_reboot_command_dialog"
+            app:icon="@drawable/ic_term" />
+        <DropDownPreference
+            android:defaultValue="@string/stream_command_1"
+            android:entries="@array/command_examples"
+            android:icon="@drawable/ic_list"
+            android:key="example_reboot_command"
+            android:title="@string/tittle_example_reboot_command"
+            app:entryValues="@array/command_examples"
+            app:iconSpaceReserved="false" />
+        <Preference
+            android:icon="@drawable/ic_service"
+            android:key="test_reboot"
+            android:title="@string/tittle_reboot_test"
+            app:defaultValue="wgwrg"
+            app:iconSpaceReserved="false" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/tittle_cat_advanced"
+        app:iconSpaceReserved="false"
+        app:initialExpandedChildrenCount="0"
+        app:key="cat_advanced">
+        <DropDownPreference
+            android:entries="@array/usb_modes"
+            android:icon="@drawable/ic_usb"
+            android:key="mode_usb"
+            android:title="@string/tittle_mode_usb"
+            app:defaultValue="@string/opt_mode_usb_off"
+            app:entryValues="@array/usb_modes"
+            app:iconSpaceReserved="false" />
+        <Preference
+            android:icon="@drawable/ic_permission"
+            android:key="nag_permission"
+            android:title="@string/tittle_nag_permission"
+            app:iconSpaceReserved="false"
+            app:summary="@string/summ_nag_permission" />
+        <com.github.girator.rebooter.SoundPreference
+            android:defaultValue=""
+            android:key="edit_noice"
+            android:title="@string/tittle_edit_noice"
+            app:dialogIcon="@drawable/ic_noice"
+            app:dialogTitle="@string/tittle_edit_noice_dialog"
+            app:icon="@drawable/ic_noice" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="edit_tts"
+            android:title="@string/tittle_edit_tts"
+            app:dialogIcon="@drawable/ic_speak"
+            app:dialogTitle="@string/tittle_edit_tts_dialog"
+            app:icon="@drawable/ic_speak" />
+        <com.github.girator.rebooter.RangePreference
+            android:defaultValue="@string/interval_minutes_default"
+            android:key="edit_interval"
+            android:summary="@string/summ_edit_interval"
+            android:title="@string/tittle_edit_interval"
+            android:dialogIcon="@drawable/ic_interval"
+            android:dialogTitle="@string/tittle_edit_interval_dialog"
+            android:icon="@drawable/ic_interval"
+            />
+    </PreferenceCategory>
+</PreferenceScreen>

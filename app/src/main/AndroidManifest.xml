@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.github.girator.rebooter">
+
+<!--    Generic permission reqired for notifications -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+<!--    To catch "screen unlock" events, reciever registerd in foreground service.
+        Since API 26 "ACTION_USER_PRESENT" receiver can not be declared in manifest.    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+<!--    This app does not collect, send or recieve any data.
+        Since API 34 this is reqired for each foreground service.
+        "DATA_SYNC" is only type without extra reqirements available at the time.   -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+
+<!--    Used to delay planned reboot each time user unlocks screen.     -->
+    <uses-permission android:name="android.permission.ACTION_USER_PRESENT"/>
+
+<!--    Alarms used to wake-up device from doze mode on exact time when device doze mode   -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+<!--    Used to start service after after actual reboot     -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+
+<!--    Supposed to improve reliability if exact alarms denied or does not work -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+<!--    Supposed to provide function without SU as system app in custom roms -->
+    <uses-permission android:name="android.permission.REBOOT"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Rebooter">
+        <activity
+            android:name="com.github.girator.rebooter.SettingsActivity"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <service
+            android:name="com.github.girator.rebooter.RebooterService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync">
+        </service>
+        <receiver
+           android:name="com.github.girator.rebooter.BootReciever"
+           android:exported="true">
+           <intent-filter>
+               <action android:name="android.intent.action.BOOT_COMPLETED" />
+           </intent-filter>
+        </receiver>
+        <receiver
+           android:name="com.github.girator.rebooter.AlarmReciever"
+           android:exported="true">
+        </receiver>
+    </application>
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+</manifest>
