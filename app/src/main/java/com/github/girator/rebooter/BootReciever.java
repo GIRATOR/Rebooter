@@ -70,7 +70,7 @@ public class BootReciever extends BroadcastReceiver {
             }else{
                 //  on android 11- mainfest should be enough
                 manager.cancel(pending_intent);
-                Log.w("rebooter_log","alarm watchdog canceled");;
+                Log.w("rebooter_log","alarm watchdog canceled");
             }
         }catch(Exception e){
             Log.w("rebooter_log","exception while canceling alarm");

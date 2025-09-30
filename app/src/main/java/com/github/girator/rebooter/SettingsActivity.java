@@ -42,7 +42,6 @@ import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -192,7 +191,7 @@ public class SettingsActivity extends AppCompatActivity {
 // first launch permissions nag
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext().getApplicationContext());
             Boolean first_launch_permission_check = preferences.getBoolean("first_launch_permission_check", false);
-            if ((first_launch_permission_check == null) || (first_launch_permission_check == false)) {
+            if (first_launch_permission_check == false) {
                 first_launch_permission_check();
     // save flag so we dont do it again
                 SharedPreferences.Editor editor = preferences.edit();
@@ -212,7 +211,7 @@ public class SettingsActivity extends AppCompatActivity {
                 edit_time.setEnabled(false);
                 edit_day.setEnabled(false);
             }
-            if(reboot_method.equals(res.getString(R.string.opt_reboot_method_intent).toString())){
+            if(reboot_method.getValue().equals(res.getString(R.string.opt_reboot_method_intent).toString())){
                 edit_reboot_command.setEnabled(false);
                 example_reboot_command.setEnabled(false);
             }else{
@@ -224,8 +223,7 @@ public class SettingsActivity extends AppCompatActivity {
     // main switch
             switch_main.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    Resources res = getContext().getApplicationContext().getResources();
+                public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
                     Intent service_intent = new Intent(getContext(), RebooterService.class);
                     disable_alarm_watchdog();
                     getContext().getApplicationContext().stopService(service_intent);
@@ -238,10 +236,10 @@ public class SettingsActivity extends AppCompatActivity {
             });
             switch_main.setSummaryProvider(new Preference.SummaryProvider() {
                 @Override
-                public CharSequence provideSummary(Preference preference) {
+                public CharSequence provideSummary(@NonNull Preference preference) {
                     Resources res = getContext().getApplicationContext().getResources();
         // detect running background job
-                    String summ = "";
+                    String summ;
                     Boolean service_running = false;
                     for (ActivityManager.RunningServiceInfo service_info : ((ActivityManager) getContext().getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE)).getRunningServices(Integer.MAX_VALUE)) {
                         if (service_info.service.getClassName().equals(RebooterService.class.getName().toString()))
@@ -272,8 +270,7 @@ public class SettingsActivity extends AppCompatActivity {
     // user activity trigger switch
             switch_activity.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    Resources res = getContext().getApplicationContext().getResources();
+                public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
         // enable period, disable only if schedule active
                     if ((Boolean) newValue) {
                         edit_period.setEnabled(true);
@@ -339,7 +336,7 @@ public class SettingsActivity extends AppCompatActivity {
             });
             edit_period.setSummaryProvider(new Preference.SummaryProvider() {
                 @Override
-                public CharSequence provideSummary(Preference preference) {
+                public CharSequence provideSummary(@NonNull Preference preference) {
                     Resources res = getContext().getApplicationContext().getResources();
                     String[] str = (((EditTextPreference) preference).getText() + ":00:00").split(":");
                     Integer HH = Integer.parseInt(str[0]);
@@ -356,10 +353,8 @@ public class SettingsActivity extends AppCompatActivity {
             });
     // schedule switch
             switch_schedule.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                Resources res = getContext().getApplicationContext().getResources();
-
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
         // disable only if no user activity trigger, enable period
                     if ((Boolean) newValue) {
                         if (!switch_activity.isChecked()) {
@@ -380,15 +375,14 @@ public class SettingsActivity extends AppCompatActivity {
     // schedule time edit
             edit_time.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
                     stop_main_switch(switch_main);
                     return true;
                 }
             });
             edit_time.setSummaryProvider(new Preference.SummaryProvider() {
                 @Override
-                public CharSequence provideSummary(Preference preference) {
-                    Resources res = getContext().getApplicationContext().getResources();
+                public CharSequence provideSummary(@NonNull Preference preference) {
                     String[] str = (((EditTextPreference) preference).getText() + ":00:00").split(":");
                     return String.format("%02d", Integer.parseInt(str[0])) + ":" + String.format("%02d", Integer.parseInt(str[1]));
                 }
@@ -397,7 +391,7 @@ public class SettingsActivity extends AppCompatActivity {
             edit_day.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 Resources res = getContext().getApplicationContext().getResources();
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
                     if(((Set<String>)newValue).size() > 0){
                         //stop service
                         stop_main_switch(switch_main);
@@ -411,8 +405,7 @@ public class SettingsActivity extends AppCompatActivity {
             });
             edit_day.setSummaryProvider(new Preference.SummaryProvider() {
                 @Override
-                public CharSequence provideSummary(Preference preference) {
-                    Resources res = getContext().getApplicationContext().getResources();
+                public CharSequence provideSummary(@NonNull Preference preference) {
                     Set<String> selected = ((MultiSelectListPreference) preference).getValues();
                     CharSequence[] values = ((MultiSelectListPreference) preference).getEntryValues();
                     CharSequence[] names = ((MultiSelectListPreference) preference).getEntries();
@@ -438,14 +431,14 @@ public class SettingsActivity extends AppCompatActivity {
             edit_interval.set_range(res.getInteger(R.integer.interval_minutes_min), res.getInteger(R.integer.interval_minutes_max), false);
             edit_interval.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
                     stop_main_switch(switch_main);
                     return true;
                 }
             });
             edit_interval.setSummaryProvider(new Preference.SummaryProvider() {
                 @Override
-                public CharSequence provideSummary(Preference preference) {
+                public CharSequence provideSummary(@NonNull Preference preference) {
                     Resources res = getContext().getApplicationContext().getResources();
                     String summ = res.getString(R.string.summ_edit_interval) + "\n";
                     summ = summ + ((EditTextPreference) preference).getText().toString() + " ";
@@ -456,7 +449,7 @@ public class SettingsActivity extends AppCompatActivity {
     // reboot method
             reboot_method.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
                     Resources res = getContext().getApplicationContext().getResources();
                     if (((String)newValue).equals(res.getString(R.string.opt_reboot_method_intent).toString())){
                         edit_reboot_command.setEnabled(false);
@@ -487,15 +480,14 @@ public class SettingsActivity extends AppCompatActivity {
     // reboot command
             edit_reboot_command.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
                     stop_main_switch(switch_main);
                     return true;
                 }
             });
             edit_reboot_command.setSummaryProvider(new Preference.SummaryProvider() {
                 @Override
-                public CharSequence provideSummary(Preference preference) {
-                    Resources res = getContext().getApplicationContext().getResources();
+                public CharSequence provideSummary(@NonNull Preference preference) {
                     String summ = ((EditTextPreference) preference).getText().toString();
                     return summ;
                 }
@@ -503,7 +495,7 @@ public class SettingsActivity extends AppCompatActivity {
     // command examples
             example_reboot_command.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
                     if( ((((String)newValue).equals(res.getString(R.string.stream_command_1).toString()))) || ((((String)newValue).equals(res.getString(R.string.stream_command_2).toString()))) ){
                         reboot_method.setValue(res.getString(R.string.opt_reboot_method_stream).toString());
                     }else{
@@ -516,7 +508,7 @@ public class SettingsActivity extends AppCompatActivity {
     // test reboot
             test_reboot.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
-                public boolean onPreferenceClick(Preference preference) {
+                public boolean onPreferenceClick(@NonNull Preference preference) {
                     Resources res = getContext().getApplicationContext().getResources();
                     AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
                     alert.setTitle(res.getString(R.string.tittle_reboot_test).toString());
@@ -541,7 +533,7 @@ public class SettingsActivity extends AppCompatActivity {
     // nag permissions
             nag_permission.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
-                public boolean onPreferenceClick(Preference preference) {
+                public boolean onPreferenceClick(@NonNull Preference preference) {
                     first_launch_permission_check();
                     return false;
                 }
@@ -549,7 +541,7 @@ public class SettingsActivity extends AppCompatActivity {
     // usb trigger
             mode_usb.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
                     stop_main_switch(switch_main);
                     return true;
                 }
@@ -578,7 +570,7 @@ public class SettingsActivity extends AppCompatActivity {
     // tts warning
             edit_tts.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
                     if((TTS != null) && (tts_ok)){
                         TTS.setLanguage(Locale.getDefault());
                         TTS.speak((String)newValue,TextToSpeech.QUEUE_FLUSH,null, null);
@@ -595,7 +587,7 @@ public class SettingsActivity extends AppCompatActivity {
             });
             edit_tts.setSummaryProvider(new Preference.SummaryProvider() {
                 @Override
-                public CharSequence provideSummary(Preference preference) {
+                public CharSequence provideSummary(@NonNull Preference preference) {
                     String summ = ((EditTextPreference) preference).getText().toString();
                     return summ;
                 }
@@ -615,7 +607,7 @@ public class SettingsActivity extends AppCompatActivity {
             });
             edit_noice.setSummaryProvider(new Preference.SummaryProvider() {
                 @Override
-                public CharSequence provideSummary(Preference preference) {
+                public CharSequence provideSummary(@NonNull Preference preference) {
                     String summ = "";
                     Uri uri = Uri.parse(((EditTextPreference) preference).getText());
                     if (uri != null){
@@ -624,6 +616,7 @@ public class SettingsActivity extends AppCompatActivity {
                             int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
                             cursor.moveToFirst();
                             summ = cursor.getString(nameIndex);
+                            cursor.close();
                         }
                     }
                     return summ;
@@ -633,7 +626,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         public void test_reboot(){
-            Resources res = getContext().getApplicationContext().getResources();
             Intent service_intent = new Intent(getContext(), RebooterService.class);
             ServiceConnection service_connection = new ServiceConnection() {
                 @Override
@@ -679,7 +671,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }else{
                     //  on android 11- mainfest should be enough
                     manager.cancel(pending_intent);
-                    Log.w("rebooter_log","alarm watchdog canceled");;
+                    Log.w("rebooter_log","alarm watchdog canceled");
                 }
             }catch(Exception e){
                 Log.w("rebooter_log","exception while canceling alarm");
