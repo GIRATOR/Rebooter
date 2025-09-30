@@ -1,5 +1,5 @@
 - updated gradle to 8.13
-- updated java to 21
+- updated java to 17
 - updated appcompat to 1.7.1
 - updated material to 1.13.0
 - insignificant gui bug fixes
