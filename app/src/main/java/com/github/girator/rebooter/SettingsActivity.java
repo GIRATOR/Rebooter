@@ -86,9 +86,22 @@ public class SettingsActivity extends AppCompatActivity {
             transaction.commit();
         }
 
+// add icon to that strip on top with app tittle
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setLogo(R.mipmap.ic_launcher);
+            actionBar.setDisplayUseLogoEnabled(true);
+            actionBar.setTitle(R.string.tittle_app);
+            actionBar.setDisplayShowTitleEnabled(true);
+        }
+
 // fix overlap from edge to edge on android 15+
 // pad our fragment by magicaly retrieved values
         if (android.os.Build.VERSION.SDK_INT >= 35) {
+            // temporary fix to make it usable
+            if (actionBar != null)
+                actionBar.hide();
             ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), new OnApplyWindowInsetsListener() {
                 @NonNull
                 @Override
@@ -98,17 +111,6 @@ public class SettingsActivity extends AppCompatActivity {
                     return windowInsets;
                 }
             });
-        }
-
-// add icon to that strip on top with app tittle
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setLogo(R.mipmap.ic_launcher);
-            actionBar.setDisplayUseLogoEnabled(true);
-            actionBar.setTitle(R.string.tittle_app);
-            actionBar.setDisplayShowTitleEnabled(true);
-            //actionBar.hide();
         }
 
 // create notification channels here because where else
