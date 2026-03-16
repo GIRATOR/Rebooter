@@ -60,11 +60,17 @@ public class BootReciever extends BroadcastReceiver {
                     PendingIntent.FLAG_CANCEL_CURRENT|PendingIntent.FLAG_IMMUTABLE
             );
             // check permission on android 12+
-            if(manager.canScheduleExactAlarms()){
+            if (android.os.Build.VERSION.SDK_INT >= 31) {
+                if(manager.canScheduleExactAlarms()){
+                    manager.cancel(pending_intent);
+                    Log.w("rebooter_log","alarm watchdog canceled");
+                }else{
+                    Log.w("rebooter_log","no permission to set alarm");
+                }
+            }else{
+                //  on android 11- mainfest should be enough
                 manager.cancel(pending_intent);
                 Log.w("rebooter_log","alarm watchdog canceled");
-            }else{
-                Log.w("rebooter_log","no permission to set alarm");
             }
         }catch(Exception e){
             Log.w("rebooter_log","exception while canceling alarm");

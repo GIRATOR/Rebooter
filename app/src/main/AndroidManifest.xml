@@ -9,8 +9,10 @@
         Since API 26 "ACTION_USER_PRESENT" receiver can not be declared in manifest.    -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
-<!--    Since API 34 this is reqired for each foreground service.   -->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+<!--    This app does not collect, send or recieve any data.
+        Since API 34 this is reqired for each foreground service.
+        "DATA_SYNC" is only type without extra reqirements available at the time.   -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
 
 <!--    Used to delay planned reboot each time user unlocks screen.     -->
     <uses-permission android:name="android.permission.ACTION_USER_PRESENT"/>
@@ -47,11 +49,7 @@
             android:name="com.github.girator.rebooter.RebooterService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Reqired for recieving events monitoring of which only possible from foreground (screen unlock, usb etc.)"
-                />
+            android:foregroundServiceType="dataSync">
         </service>
         <receiver
            android:name="com.github.girator.rebooter.BootReciever"

@@ -31,7 +31,6 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Parcelable;
@@ -41,7 +40,6 @@ import android.speech.tts.TextToSpeech;
 import android.text.InputType;
 import android.text.method.DigitsKeyListener;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.EditText;
 import androidx.activity.result.ActivityResult;
@@ -96,25 +94,23 @@ public class SettingsActivity extends AppCompatActivity {
             actionBar.setDisplayUseLogoEnabled(true);
             actionBar.setTitle(R.string.tittle_app);
             actionBar.setDisplayShowTitleEnabled(true);
-            // fix overlap from edge to edge on android 15+
-            // pad our fragment by magicaly retrieved values
-            if (Build.VERSION.SDK_INT >= 35) {
-                int extra_offset ;
-                TypedValue tv = new TypedValue();
-                if (getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true))
-                    extra_offset = TypedValue.complexToDimensionPixelSize(tv.data,getResources().getDisplayMetrics());
-                else
-                    extra_offset = 0;
-                ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), new OnApplyWindowInsetsListener() {
-                    @NonNull
-                    @Override
-                    public WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat windowInsets) {
-                        Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-                        settings_fragment.getListView().setPadding(insets.left,insets.top+extra_offset,insets.right,insets.bottom);
-                        return windowInsets;
-                    }
-                });
-            }
+        }
+
+// fix overlap from edge to edge on android 15+
+// pad our fragment by magicaly retrieved values
+        if (android.os.Build.VERSION.SDK_INT >= 35) {
+            // temporary fix to make it usable
+            if (actionBar != null)
+                actionBar.hide();
+            ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), new OnApplyWindowInsetsListener() {
+                @NonNull
+                @Override
+                public WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat windowInsets) {
+                    Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+                    settings_fragment.getListView().setPadding(insets.left,insets.top,insets.right,insets.bottom);
+                    return windowInsets;
+                }
+            });
         }
 
 // create notification channels here because where else
@@ -667,11 +663,17 @@ public class SettingsActivity extends AppCompatActivity {
                         PendingIntent.FLAG_CANCEL_CURRENT|PendingIntent.FLAG_IMMUTABLE
                 );
                 // check permission on android 12+
-                if(manager.canScheduleExactAlarms()){
+                if (android.os.Build.VERSION.SDK_INT >= 31) {
+                    if(manager.canScheduleExactAlarms()){
+                        manager.cancel(pending_intent);
+                        Log.w("rebooter_log","alarm watchdog canceled");
+                    }else{
+                        Log.w("rebooter_log","no permission to set alarm");
+                    }
+                }else{
+                    //  on android 11- mainfest should be enough
                     manager.cancel(pending_intent);
                     Log.w("rebooter_log","alarm watchdog canceled");
-                }else{
-                    Log.w("rebooter_log","no permission to set alarm");
                 }
             }catch(Exception e){
                 Log.w("rebooter_log","exception while canceling alarm");
