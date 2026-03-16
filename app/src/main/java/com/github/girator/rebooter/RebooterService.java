@@ -27,6 +27,7 @@ import android.content.res.Resources;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.speech.tts.TextToSpeech;
@@ -363,7 +364,7 @@ public class RebooterService extends Service {
         builder.setContentTitle(res.getString(R.string.desc_notification_service));
         builder.setContentText("");
 // start foreground
-        startForeground(1, builder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+        startForeground(1, builder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
     }
 
     public class service_binder extends Binder {
