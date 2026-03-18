@@ -8,6 +8,7 @@
     <string name="summ_switch_main_running">service is running</string>
     <string name="summ_switch_main_error">Error:</string>
     <string name="summ_switch_main_not">service not running</string>
+    <string name="summ_switch_main_multiple">multiple services started</string>
     <string name="summ_switch_main_4">Scheduled check:</string>
     <string name="date_format_switch_main">EEEE HH:mm, dd-MM-yyyy</string>
     <!-- settings group -->

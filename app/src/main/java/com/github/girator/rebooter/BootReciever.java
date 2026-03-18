@@ -36,19 +36,24 @@ public class BootReciever extends BroadcastReceiver {
             outputStream.writeBytes("exit\n");
             outputStream.flush();
             su.waitFor();
+            Log.w("rebooter_log","boot reciever: root test OK");
         }catch(Exception e){
             Log.w("rebooter_log","boot reciever: root test exception: " + e.getMessage().toString());
         }
-// check if service setting enabled
+// start if service setting enabled
         Boolean switch_main = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext()).getBoolean("switch_main", false);
+        Intent service_intent = new Intent(context, RebooterService.class);
+        if (context.stopService(service_intent)) // stop before starting just in case
+            Log.w("rebooter_log","boot reciever: stopped old service");
         if (switch_main){
-            Log.w("rebooter_log","boot reciever: starting service");
-            Intent service_intent = new Intent(context, RebooterService.class);
+            Log.w("rebooter_log","boot reciever: starting fresh service");
             context.startForegroundService(service_intent);
+        }else{
+            Log.w("rebooter_log","boot reciever: not starting service");
         }
     }
 
-    // if changing do same in SettingsActivity
+    // if changing do same in SettingsActivity and RebooterService
     public void disable_alarm_watchdog(Context context){
         try{
             AlarmManager manager = (AlarmManager)context.getApplicationContext().getSystemService(Context.ALARM_SERVICE);
@@ -62,12 +67,12 @@ public class BootReciever extends BroadcastReceiver {
             // check permission on android 12+
             if(manager.canScheduleExactAlarms()){
                 manager.cancel(pending_intent);
-                Log.w("rebooter_log","alarm watchdog canceled");
+                Log.w("rebooter_log","boot reciever: alarm watchdog canceled");
             }else{
-                Log.w("rebooter_log","no permission to set alarm");
+                Log.w("rebooter_log","boot reciever: no permission to set alarm");
             }
         }catch(Exception e){
-            Log.w("rebooter_log","exception while canceling alarm");
+            Log.w("rebooter_log","boot reciever: exception while canceling alarm");
             e.printStackTrace();
         }
     }

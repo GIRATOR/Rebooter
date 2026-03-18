@@ -23,6 +23,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 
 // this reciever registered dynamically from service so should work without being in manifest
 public class UnlockReciever extends BroadcastReceiver {
@@ -48,13 +49,23 @@ public class UnlockReciever extends BroadcastReceiver {
         if (my_service.switch_activity){
     // calculate new end of period from now
             String[] period_str = my_service.preferences.getString("edit_period", "24:00").split(":");
-            Long new_period_end_millis = System.currentTimeMillis() + ((Long.parseLong(period_str[0]) * 60L) + Long.parseLong(period_str[1]) ) * 60L * 1000L;
+            Long new_period_end_millis = System.currentTimeMillis();
+            if (period_str.length > 1){ // hours and minutes
+                new_period_end_millis = System.currentTimeMillis() + ((Long.parseLong(period_str[0]) * 60L) + Long.parseLong(period_str[1]) ) * 60L * 1000L;
+            }else if (period_str.length == 1){ // hours only
+                new_period_end_millis = System.currentTimeMillis() + ((Long.parseLong(period_str[0]) * 60L) ) * 60L * 1000L;
+            }else{ // bad value default to 1 hour
+                Log.w("rebooter_log","unlock reciever: error: bad edit period value, defaulting to 1 hour");
+                new_period_end_millis = System.currentTimeMillis() + 60L * 60L * 1000L;
+            }
+            Log.w("rebooter_log","unlock reciever: suggest new time: " + (new SimpleDateFormat(my_service.res.getString(R.string.date_format_switch_main))).format(new_period_end_millis));
         // check maybe scheduled value is closer
             if (my_service.switch_schedule){
                 if(my_service.next_scheduled_millis != null){
                     // valid schedule exist
                     if (my_service.next_scheduled_millis < new_period_end_millis) {
                         new_period_end_millis = my_service.next_scheduled_millis;
+                        Log.w("rebooter_log","unlock reciever: sheduled time is erlier: " + (new SimpleDateFormat(my_service.res.getString(R.string.date_format_switch_main))).format(new_period_end_millis));
                     }
                 }
             }
@@ -71,7 +82,12 @@ public class UnlockReciever extends BroadcastReceiver {
         builder.setSmallIcon(R.drawable.ic_service);
         builder.setContentTitle(my_service.res.getString(R.string.desc_notification_scheduled));
         builder.setContentText((new SimpleDateFormat(my_service.res.getString(R.string.date_format_switch_main))).format(my_service.period_end_millis));
-        NotificationManagerCompat.from(context.getApplicationContext()).notify(1, builder.build());
+        try{
+            NotificationManagerCompat.from(context.getApplicationContext()).notify(1, builder.build());
+        }catch(Exception e){
+            Log.w("rebooter_log","unlock reciever: notification exception: " + e.getMessage().toString());
+        }
+
     }
 
 

@@ -18,6 +18,7 @@ package com.github.girator.rebooter;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.TimePicker;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

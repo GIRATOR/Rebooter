@@ -8,6 +8,7 @@
     <string name="summ_switch_main_running">сервіс працює</string>
     <string name="summ_switch_main_error">Помилка:</string>
     <string name="summ_switch_main_not">сервіс не працює</string>
+    <string name="summ_switch_main_multiple">кілька сервісів запущено</string>
     <string name="summ_switch_main_4">Запланована звірка:</string>
     <string name="date_format_switch_main">EEEE HH:mm, dd-MM-yyyy</string>
     <!-- settings group -->

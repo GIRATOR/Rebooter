@@ -37,6 +37,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.preference.PreferenceManager;
 import java.io.DataOutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Set;
@@ -100,7 +101,14 @@ public class RebooterService extends Service {
         load_preferences();
 // initial period value
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putLong("period_end_millis", System.currentTimeMillis() + ((Long.parseLong(edit_period[0]) * 60L) + Long.parseLong(edit_period[1]) ) * 60L * 1000L);
+        if (edit_period.length > 1){ // hours and minutes
+            editor.putLong("period_end_millis", System.currentTimeMillis() + ((Long.parseLong(edit_period[0]) * 60L) + Long.parseLong(edit_period[1]) ) * 60L * 1000L);
+        }else if (edit_period.length == 1){ // hours only
+            editor.putLong("period_end_millis", System.currentTimeMillis() + (Long.parseLong(edit_period[0]) * 60L) * 60L * 1000L);
+        }else{ // bad value default to 1 hour
+            Log.w("rebooter_log","main service: error: bad edit period value, defaulting to 1 hour");
+            editor.putLong("period_end_millis", System.currentTimeMillis() + 60L * 60L * 1000L);
+        }
         editor.apply();
 // recalculate values preferences
         calculate_runtime();
@@ -162,14 +170,14 @@ public class RebooterService extends Service {
 // try to set alarm
         if (!alarm_is_set)
             set_alarm_watchdog(period_end_millis + 5000L); // bit later to be sure it triggers
-// dont even try do anything if just rebooted
+// don't even try to do anything if just rebooted
         Long min_uptime_millis = res.getInteger(R.integer.uptime_minutes_min)*60L*1000L;
         if (uptime_millis < min_uptime_millis){
     // set sleep delay to match end of safe period
             exact_sleep_millis = Math.max(1000L, (min_uptime_millis - uptime_millis));
             Log.w("rebooter_log","main service: wait safe period ");
         }else{
-    // reboot now
+    // alert user and reboot now
             if (now_millis >= period_end_millis){
                 if(edit_noice.length() > 0) {
                     Log.w("rebooter_log","main service: atempting sound");
@@ -186,11 +194,33 @@ public class RebooterService extends Service {
                         // pause to finish speaking
                     }
                 }
+        // reboot now
                 do_reboot();
-            }else{
-    // calculate exact_sleep_millis for next run
-                exact_sleep_millis = Math.min(exact_sleep_millis, (period_end_millis - now_millis + 5000L)); // bit later to be sure it triggers
+// region ///This section is in case reboot command does not perform actual reboot/shutdown
+        // same as in part of StartCommand routine
+            // load preferences
+                load_preferences();
+            // initial period value
+                SharedPreferences.Editor editor = preferences.edit();
+                if (edit_period.length > 1){ // hours and minutes
+                    editor.putLong("period_end_millis", System.currentTimeMillis() + ((Long.parseLong(edit_period[0]) * 60L) + Long.parseLong(edit_period[1]) ) * 60L * 1000L);
+                }else if (edit_period.length == 1){ // hours only
+                    editor.putLong("period_end_millis", System.currentTimeMillis() + (Long.parseLong(edit_period[0]) * 60L) * 60L * 1000L);
+                }else{ // bad value default to 1 hour
+                    Log.w("rebooter_log","main service: error: bad edit period value, defaulting to 1 hour");
+                    editor.putLong("period_end_millis", System.currentTimeMillis() + 60L * 60L * 1000L);
+                }
+                editor.apply();
+            // recalculate values preferences
+                calculate_runtime();
+        // instead of BootReciever
+            // Reset alarm
+                disable_alarm_watchdog();
+                set_alarm_watchdog(period_end_millis + 5000L); // bit later to be sure it triggers
+// endregion ///This section is in case reboot command does not perform actual reboot/shutdown
             }
+    // calculate exact_sleep_millis for next run
+            exact_sleep_millis = Math.min(exact_sleep_millis, (period_end_millis - now_millis + 5000L)); // bit later to be sure it triggers
         }
     }
 
@@ -255,25 +285,42 @@ public class RebooterService extends Service {
                     intent,
                     PendingIntent.FLAG_CANCEL_CURRENT|PendingIntent.FLAG_IMMUTABLE
             );
-    // check permission on android 12+
-            if (android.os.Build.VERSION.SDK_INT >= 31) {
-                if(manager.canScheduleExactAlarms()){
-                    manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pending_intent);
-                    alarm_is_set = true;
-                    Log.w("rebooter_log","main service: alarm watchdog set to " + (new SimpleDateFormat(res.getString(R.string.date_format_switch_main))).format(triggerAtMillis));
-                }else{
-                    alarm_is_set = false;
-                    Log.w("rebooter_log","main service: no permission to set alarm");
-                }
-            }else{
-    //  on android 11- mainfest should be enough
+        // check permission on android 12+
+            if(manager.canScheduleExactAlarms()){
                 manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pending_intent);
                 alarm_is_set = true;
-                Log.w("rebooter_log","main service: alarm watchdog set to" + (new SimpleDateFormat(res.getString(R.string.date_format_switch_main))).format(triggerAtMillis));
+                Log.w("rebooter_log","main service: alarm watchdog set to " + (new SimpleDateFormat(res.getString(R.string.date_format_switch_main))).format(triggerAtMillis));
+            }else{
+                alarm_is_set = false;
+                Log.w("rebooter_log","main service: no permission to set alarm");
             }
         }catch(Exception e){
             alarm_is_set = false;
             Log.w("rebooter_log","main service: exception while setting alarm");
+            e.printStackTrace();
+        }
+    }
+
+    // if changing do same in SettingsActivity and BootReciever
+    public void disable_alarm_watchdog(){
+        try{
+            AlarmManager manager = (AlarmManager)getBaseContext().getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(getBaseContext().getApplicationContext(), AlarmReciever.class);
+            PendingIntent pending_intent = PendingIntent.getBroadcast(
+                    getBaseContext().getApplicationContext(),
+                    1,
+                    intent,
+                    PendingIntent.FLAG_CANCEL_CURRENT|PendingIntent.FLAG_IMMUTABLE
+            );
+            // check permission on android 12+
+            if(manager.canScheduleExactAlarms()){
+                manager.cancel(pending_intent);
+                Log.w("rebooter_log","main service: alarm watchdog canceled");
+            }else{
+                Log.w("rebooter_log","main service: no permission to set alarm");
+            }
+        }catch(Exception e){
+            Log.w("rebooter_log","main service: exception while canceling alarm");
             e.printStackTrace();
         }
     }
@@ -302,6 +349,7 @@ public class RebooterService extends Service {
 // calculate values
         default_sleep_millis = Long.parseLong(edit_interval)*60L*1000L;
         period_end_millis = preferences.getLong("period_end_millis", System.currentTimeMillis());
+        Log.w("rebooter_log","main service: suggested time: " + (new SimpleDateFormat(res.getString(R.string.date_format_switch_main))).format(period_end_millis));
 // if schedule enabled
         if (switch_schedule){
             calculate_closest_scheduled();
@@ -311,11 +359,15 @@ public class RebooterService extends Service {
                     // compare with value by user activity trigger
                     if (next_scheduled_millis < period_end_millis) {
                         period_end_millis = next_scheduled_millis;
+                        Log.w("rebooter_log","main service: sheduled time is erlier: " + (new SimpleDateFormat(res.getString(R.string.date_format_switch_main))).format(period_end_millis));
                     }
                 }else{
                     // no compromise if no user activity trigger
                     period_end_millis = next_scheduled_millis;
+                    Log.w("rebooter_log","main service: set to sheduled time: " + (new SimpleDateFormat(res.getString(R.string.date_format_switch_main))).format(period_end_millis));
                 }
+            }else{
+                Log.w("rebooter_log","main service: no valid sheduled time");
             }
         }
     }
@@ -384,7 +436,7 @@ public class RebooterService extends Service {
 
 // do not cancel alarm here, because service could be stoped non intentionally
 // cancel alarm manually in settings before stopping service
-
+        //disable_alarm_watchdog();
 // deinitialisation
         stopForeground(true);
 

@@ -246,10 +246,10 @@ public class SettingsActivity extends AppCompatActivity {
                     Resources res = getContext().getApplicationContext().getResources();
         // detect running background job
                     String summ;
-                    Boolean service_running = false;
+                    Integer service_count = 0;
                     for (ActivityManager.RunningServiceInfo service_info : ((ActivityManager) getContext().getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE)).getRunningServices(Integer.MAX_VALUE)) {
                         if (service_info.service.getClassName().equals(RebooterService.class.getName().toString()))
-                            service_running = true;
+                            service_count = service_count + 1;
                     }
         // pack summary
                     if (((SwitchPreference) preference).isChecked()) {
@@ -257,9 +257,13 @@ public class SettingsActivity extends AppCompatActivity {
                     } else {
                         summ = res.getString(R.string.summ_switch_off) + " ";
                     }
-                    if (service_running) {
+                    if (service_count > 0) {
                         if (((SwitchPreference) preference).isChecked()) {
-                            summ = summ + res.getString(R.string.summ_switch_main_running);
+                            if(service_count == 1){
+                                summ = summ + res.getString(R.string.summ_switch_main_running);
+                            }else{
+                                summ = summ + res.getString(R.string.summ_switch_main_error) + ": " + res.getString(R.string.summ_switch_main_multiple);
+                            }
                         } else {
                             summ = summ + res.getString(R.string.summ_switch_main_error) + ": " + res.getString(R.string.summ_switch_main_running);
                         }
@@ -305,6 +309,8 @@ public class SettingsActivity extends AppCompatActivity {
                         summ = summ + String.valueOf(res.getInteger(R.integer.period_minutes_min)) + " ";
                         summ = summ + res.getString(R.string.summ_edit_period_minutes);
                         Snackbar.make(getView(), summ, Snackbar.LENGTH_LONG).show();
+                    //stop service
+                        stop_main_switch(switch_main);
                         return false;
                     }
         // suggest larger value
@@ -327,6 +333,7 @@ public class SettingsActivity extends AppCompatActivity {
                         });
                         builder.create().show();
                     }
+                //stop service
                     stop_main_switch(switch_main);
                     return true;
                 }
@@ -335,7 +342,7 @@ public class SettingsActivity extends AppCompatActivity {
                 @Override
                 public void onBindEditText(@NonNull EditText editText) {
                     editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-                    editText.setKeyListener(DigitsKeyListener.getInstance("123456789"));
+                    editText.setKeyListener(DigitsKeyListener.getInstance("0123456789"));
                     editText.setText("24");
                     editText.setSelected(true);
                 }
@@ -382,6 +389,7 @@ public class SettingsActivity extends AppCompatActivity {
             edit_time.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
+                //stop service
                     stop_main_switch(switch_main);
                     return true;
                 }
@@ -399,11 +407,13 @@ public class SettingsActivity extends AppCompatActivity {
                 @Override
                 public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
                     if(((Set<String>)newValue).size() > 0){
-                        //stop service
+                    //stop service
                         stop_main_switch(switch_main);
                         return true;
                     }else{
                         Snackbar.make(getView(), res.getString(R.string.desc_edit_day_zero), Snackbar.LENGTH_LONG).show();
+                    //stop service
+                        stop_main_switch(switch_main);
                         return false;
                     }
 
@@ -438,6 +448,7 @@ public class SettingsActivity extends AppCompatActivity {
             edit_interval.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
+                //stop service
                     stop_main_switch(switch_main);
                     return true;
                 }
@@ -464,6 +475,8 @@ public class SettingsActivity extends AppCompatActivity {
                         edit_reboot_command.setEnabled(true);
                         example_reboot_command.setEnabled(true);
                     }
+                //stop service
+                    stop_main_switch(switch_main);
                     return true;
                 }
             });
@@ -487,6 +500,7 @@ public class SettingsActivity extends AppCompatActivity {
             edit_reboot_command.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
+                //stop service
                     stop_main_switch(switch_main);
                     return true;
                 }
@@ -508,6 +522,8 @@ public class SettingsActivity extends AppCompatActivity {
                         reboot_method.setValue(res.getString(R.string.opt_reboot_method_inline).toString());
                     }
                     edit_reboot_command.setText((String)newValue);
+                //stop service
+                    stop_main_switch(switch_main);
                     return true;
                 }
             });
@@ -548,6 +564,7 @@ public class SettingsActivity extends AppCompatActivity {
             mode_usb.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(@NonNull Preference preference, Object newValue) {
+                //stop service
                     stop_main_switch(switch_main);
                     return true;
                 }
@@ -580,13 +597,13 @@ public class SettingsActivity extends AppCompatActivity {
                     if((TTS != null) && (tts_ok)){
                         TTS.setLanguage(Locale.getDefault());
                         TTS.speak((String)newValue,TextToSpeech.QUEUE_FLUSH,null, null);
+                    //stop service
                         stop_main_switch(switch_main);
                         return true;
                     }else{
                         edit_tts.setText("");
                         Snackbar.make(getView(), res.getString(R.string.tittle_edit_tts_error), Snackbar.LENGTH_LONG).show();
-                        Log.w("rebooter_log","tts speak fail");
-                        stop_main_switch(switch_main);
+                        Log.w("rebooter_log","settings activity: tts speak fail");
                         return false;
                     }
                 }
@@ -628,21 +645,26 @@ public class SettingsActivity extends AppCompatActivity {
                     return summ;
                 }
             });
-
         }
 
+        public ServiceConnection service_connection;
         public void test_reboot(){
             Intent service_intent = new Intent(getContext(), RebooterService.class);
-            ServiceConnection service_connection = new ServiceConnection() {
+            service_connection = new ServiceConnection() {
                 @Override
                 public void onServiceConnected(ComponentName name, IBinder service) {
                     RebooterService my_service = ((RebooterService.service_binder)service).getService();
                     if (my_service != null){
                         Log.w("rebooter_log","settings activity: bind succesfull, triggering reboot");
-                        my_service.load_preferences();
+                        my_service.load_preferences(); // this is needed before reboot to update method/command
                         my_service.do_reboot();
-                // should be rebooting here
-                        getContext().getApplicationContext().stopService(service_intent);
+                    // it is possible to get here if command does not perform actual reboot/shutdown
+                    // unbind service
+                        Log.w("rebooter_log","settings activity: attemting unbind service");
+                        getContext().getApplicationContext().unbindService(service_connection);
+                    // switch toggle should also stop service
+                        stop_main_switch(getPreferenceScreen().findPreference("switch_main"));
+                        // getContext().getApplicationContext().stopService(service_intent);
                     }
                 }
                 @Override
@@ -650,12 +672,13 @@ public class SettingsActivity extends AppCompatActivity {
 
                 }
             };
-//  autocreate bind without checking
+
+    // autocreate bind without checking
             Log.w("rebooter_log","settings activity: attemting bind_auto_create service");
             getContext().getApplicationContext().bindService(service_intent, service_connection, BIND_AUTO_CREATE);
         }
 
-        // if changing do same in BootReciever
+        // if changing do same in BootReciever and RebooterService
         public void disable_alarm_watchdog(){
             try{
                 AlarmManager manager = (AlarmManager)getContext().getApplicationContext().getSystemService(Context.ALARM_SERVICE);
@@ -669,12 +692,12 @@ public class SettingsActivity extends AppCompatActivity {
                 // check permission on android 12+
                 if(manager.canScheduleExactAlarms()){
                     manager.cancel(pending_intent);
-                    Log.w("rebooter_log","alarm watchdog canceled");
+                    Log.w("rebooter_log","settings activity: alarm watchdog canceled");
                 }else{
-                    Log.w("rebooter_log","no permission to set alarm");
+                    Log.w("rebooter_log","settings activity: no permission to set alarm");
                 }
             }catch(Exception e){
-                Log.w("rebooter_log","exception while canceling alarm");
+                Log.w("rebooter_log","settings activity: exception while canceling alarm");
                 e.printStackTrace();
             }
         }
@@ -697,7 +720,7 @@ public class SettingsActivity extends AppCompatActivity {
                         outputStream.flush();
                         su.waitFor();
                     }catch(Exception e){
-                        Log.w("rebooter_log","permissions exception: " + e.getMessage().toString());
+                        Log.w("rebooter_log","settings activity: permissions exception: " + e.getMessage().toString());
                     }
     // optimisation exclusion
                     try{
@@ -705,7 +728,7 @@ public class SettingsActivity extends AppCompatActivity {
                         i.setData(Uri.parse("package:" + getContext().getApplicationContext().getPackageName()));
                         startActivity(i);
                     }catch(Exception e){
-                        Log.w("rebooter_log","permissions exception: " + e.getMessage().toString());
+                        Log.w("rebooter_log","settings activity: permissions exception: " + e.getMessage().toString());
                     }
     // exact alarm
                     try{
@@ -713,7 +736,7 @@ public class SettingsActivity extends AppCompatActivity {
                         i.setData(Uri.parse("package:" + getContext().getApplicationContext().getPackageName()));
                         startActivity(i);
                     }catch(Exception e){
-                        Log.w("rebooter_log","permissions exception: " + e.getMessage().toString());
+                        Log.w("rebooter_log","settings activity: permissions exception: " + e.getMessage().toString());
                     }
     // notifications
                     try{
@@ -721,7 +744,7 @@ public class SettingsActivity extends AppCompatActivity {
                         i.putExtra(Settings.EXTRA_APP_PACKAGE, getContext().getApplicationContext().getPackageName());
                         startActivity(i);
                     }catch(Exception e){
-                        Log.w("rebooter_log","permissions exception: " + e.getMessage().toString());
+                        Log.w("rebooter_log","settings activity: permissions exception: " + e.getMessage().toString());
                     }
                 }
             });
@@ -736,6 +759,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         public void stop_main_switch(SwitchPreference main_switch){
             if (main_switch.isChecked()){
+                disable_alarm_watchdog(); // ensure alarm trigger time updated
                 Intent service_intent = new Intent(getContext(), RebooterService.class);
                 getContext().stopService(service_intent);
                 Resources res = getContext().getResources();

@@ -27,22 +27,26 @@ import android.util.Log;
 
 public class AlarmReciever extends BroadcastReceiver {
     public RebooterService my_service;
+    public ServiceConnection service_connection;
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Intent service_intent = new Intent(context, RebooterService.class);
 // accesing running service
-        ServiceConnection service_connection = new ServiceConnection() {
+        service_connection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 my_service = ((RebooterService.service_binder)service).getService();
                 if (my_service != null){
-                    Log.w("rebooter_log","alarm reciever: bind succesfull, notyfing main thread");
+                    Log.w("rebooter_log","alarm reciever: notyfing main thread");
     // wakeup waiting thread
                     synchronized(my_service.run_service_thread){
                         my_service.alarm_is_set = false;
                         my_service.run_service_thread.notifyAll();
                     }
+                    // unbind service after notify
+                    Log.w("rebooter_log","alarm reciever: attemting unbind service");
+                    context.getApplicationContext().unbindService(service_connection);
                 }
             }
             @Override
@@ -51,16 +55,28 @@ public class AlarmReciever extends BroadcastReceiver {
             }
         };
 // check if service is running
-        Boolean service_running = false;
+        Integer service_count = 0;
         for (ActivityManager.RunningServiceInfo service_info: ((ActivityManager)context.getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE)).getRunningServices(Integer.MAX_VALUE)) {
             if (service_info.service.getClassName().equals(RebooterService.class.getName().toString()))
-                service_running = true;
+                service_count = service_count + 1;
         }
-        if (service_running){
-            Log.w("rebooter_log","alarm reciever: attemting bind runnig service");
-            context.getApplicationContext().bindService(service_intent, service_connection, 0);
+        if (service_count > 0){
+            boolean bind_success = false;
+            Log.w("rebooter_log","alarm reciever: found " + service_count.toString() + " runnig service(s), attemting to bind");
+            try{
+                bind_success = context.getApplicationContext().bindService(service_intent, service_connection, 0);
+                if(bind_success){
+                    Log.w("rebooter_log","alarm reciever: bind succesfull");
+                }else{
+                    Log.w("rebooter_log","alarm reciever: bind failed");
+                    context.getApplicationContext().unbindService(service_connection);
+                }
+            } catch (Exception e) {
+                Log.w("rebooter_log","alarm reciever: bind exception: " + e.getMessage().toString());
+                context.getApplicationContext().unbindService(service_connection);
+            }
         }else{
-            Log.w("rebooter_log","alarm reciever: no running service, starting");
+            Log.w("rebooter_log","alarm reciever: no running service, starting one");
             context.getApplicationContext().startForegroundService(service_intent);
         }
     }
