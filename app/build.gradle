@@ -3,13 +3,31 @@ plugins {
 }
 android {
     namespace = "com.github.girator.rebooter"
-    compileSdkVersion 36
     defaultConfig {
         applicationId 'com.github.girator.rebooter'
-        minSdkVersion 34
-        targetSdkVersion 36
-        versionCode 14
-        versionName "1.4"
+        versionName "1.4.1"
+    }
+    flavorDimensions "version"
+    productFlavors { 
+        legacy {
+	        dimension "version"
+            versionCode 1410
+            compileSdkVersion 33
+            minSdkVersion 24
+            targetSdkVersion 33
+        }
+        android14 {
+            dimension "version"
+            versionCode 1411
+            compileSdkVersion 36
+            minSdkVersion 34
+            targetSdkVersion 36
+        }  
+    }
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = "rebooter_${variant.versionCode}.apk"
+        }
     }
     buildTypes {
         release {
@@ -22,8 +40,8 @@ android {
         includeInBundle false
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 }
 dependencies {

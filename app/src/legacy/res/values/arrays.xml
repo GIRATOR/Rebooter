@@ -1,0 +1,31 @@
+<resources>
+    <string-array name="weekday_names">
+        <item>@string/Monday</item>     <!-- 0 -->
+        <item>@string/Tuesday</item>    <!-- 1 -->
+        <item>@string/Wednesday</item>  <!-- 2 -->
+        <item>@string/Thursday</item>   <!-- 3 -->
+        <item>@string/Friday</item>     <!-- 4 -->
+        <item>@string/Saturday</item>   <!-- 5 -->
+        <item>@string/Sunday</item>     <!-- 6 -->
+    </string-array>
+    <string-array name="usb_modes">
+        <item>@string/opt_mode_usb_off</item>
+        <item>@string/opt_mode_usb_locked</item>
+        <item>@string/opt_mode_usb_on</item>
+    </string-array>
+    <string-array name="reboot_methods">
+        <item>@string/opt_reboot_method_inline</item>
+        <item>@string/opt_reboot_method_stream</item>
+        <item>@string/opt_reboot_method_intent</item>
+    </string-array>
+    <string-array name="command_examples">
+        <item>@string/inline_command_1</item>
+        <item>@string/inline_command_2</item>
+        <item>@string/inline_command_3</item>
+        <item>@string/inline_command_4</item>
+        <item>@string/inline_command_5</item>
+        <item>@string/stream_command_1</item>
+        <item>@string/stream_command_2</item>
+    </string-array>
+</resources>
+
